@@ -1,0 +1,17 @@
+﻿<Settings>
+    <!-- Multicast IP address and port for streaming quotes -->
+    <MulticastIP>239.0.0.222</MulticastIP>
+    <Port>5000</Port>
+
+    <!-- Range of simulated market quotes -->
+    <MinValue>10.00</MinValue>
+    <MaxValue>2000.00</MaxValue>
+
+    <!-- Tick size for quotes (step between possible values) -->
+    <TickSize>0.10</TickSize>
+
+    <ModeAlgorithm>Dictionary</ModeAlgorithm>
+    <!-- Select the mode calculation algorithm: "Dictionary" – exact counting (may use significant memory for large value ranges), 
+         "SpaceSaving" – approximate counting for large streams with limited memory (may slightly affect accuracy) -->
+    <ModeAlgorithm>Dictionary</ModeAlgorithm>
+</Settings>
