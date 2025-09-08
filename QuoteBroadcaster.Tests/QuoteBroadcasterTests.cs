@@ -1,50 +1,55 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using Moq;
-using QuoteBroadcaster.UdpClientWrapper;
 
 namespace QuoteBroadcaster.Tests;
 
 public class QuoteBroadcasterTests
 {
+    private int GetRandomPort() => new Random().Next(20000, 40000);
+
     [Fact]
-    public async Task BroadcastQuoteAsync_ShouldSendCorrectMessage()
+    public async Task ShouldBroadcastSingleQuote()
     {
-        var udpMock = new Mock<IUdpClientWrapper>();
-        IPEndPoint ep = new(IPAddress.Parse("239.0.0.222"), 5000);
-        var broadcaster = new QuoteBroadcaster(udpMock.Object, ep);
+        int port = GetRandomPort();
+        using var listener = new UdpClient(port); // bind listener first
+        var endpoint = new IPEndPoint(IPAddress.Loopback, port);
+        var broadcaster = new QuoteBroadcaster(new UdpClient(), endpoint);
 
-        await broadcaster.BroadcastQuoteAsync(123.45m);
+        await broadcaster.BroadcastQuoteAsync(1.00m);
 
-        udpMock.Verify(u => u.SendAsync(
-            It.Is<byte[]>(b => Encoding.UTF8.GetString(b) == "1:123.45"),
-            It.IsAny<int>(),
-            ep
-        ), Times.Once);
+        string message = await UdpTestHelper.ReceiveUdpMessage(listener);
+        Assert.Equal("1:1.00", message);
     }
-    
 
     [Fact]
-    public async Task BroadcastQuoteAsync_ShouldIncrementSequence()
+    public async Task ShouldIncrementSequenceForMultipleQuotes()
     {
-        var udpMock = new Mock<IUdpClientWrapper>();
-        IPEndPoint ep = new(IPAddress.Parse("239.0.0.222"), 5000);
-        var broadcaster = new QuoteBroadcaster(udpMock.Object, ep);
+        int port = GetRandomPort();
+        using var listener = new UdpClient(port);
+        var endpoint = new IPEndPoint(IPAddress.Loopback, port);
+        var broadcaster = new QuoteBroadcaster(new UdpClient(), endpoint);
 
-        await broadcaster.BroadcastQuoteAsync(1m);
-        await broadcaster.BroadcastQuoteAsync(2m);
+        await broadcaster.BroadcastQuoteAsync(1.00m);
+        await broadcaster.BroadcastQuoteAsync(2.50m);
 
-        udpMock.Verify(u => u.SendAsync(
-            It.Is<byte[]>(b => Encoding.UTF8.GetString(b) == "1:1.00"),
-            It.IsAny<int>(),
-            ep
-        ), Times.Once);
+        string msg1 = await UdpTestHelper.ReceiveUdpMessage(listener);
+        string msg2 = await UdpTestHelper.ReceiveUdpMessage(listener);
 
-        udpMock.Verify(u => u.SendAsync(
-            It.Is<byte[]>(b => Encoding.UTF8.GetString(b) == "2:2.00"),
-            It.IsAny<int>(),
-            ep
-        ), Times.Once);
+        Assert.Equal("1:1.00", msg1);
+        Assert.Equal("2:2.50", msg2);
+    }
+
+    [Fact]
+    public async Task ShouldFormatDecimalWithTwoDigits()
+    {
+        int port = GetRandomPort();
+        using var listener = new UdpClient(port);
+        var endpoint = new IPEndPoint(IPAddress.Loopback, port);
+        var broadcaster = new QuoteBroadcaster(new UdpClient(), endpoint);
+
+        await broadcaster.BroadcastQuoteAsync(123.4567m);
+
+        string msg = await UdpTestHelper.ReceiveUdpMessage(listener);
+        Assert.Equal("1:123.46", msg);
     }
 }

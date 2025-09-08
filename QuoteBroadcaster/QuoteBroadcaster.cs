@@ -1,16 +1,16 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 using System.Text;
-using QuoteBroadcaster.UdpClientWrapper;
 
 namespace QuoteBroadcaster;
 
 internal class QuoteBroadcaster
 {
-    private readonly IUdpClientWrapper _udpClient;
+    private readonly UdpClient _udpClient;
     private readonly IPEndPoint _remoteEP;
     private long _seq = 0;
 
-    public QuoteBroadcaster(IUdpClientWrapper udpClient, IPEndPoint remoteEP)
+    public QuoteBroadcaster(UdpClient udpClient, IPEndPoint remoteEP)
     {
         _udpClient = udpClient;
         _remoteEP = remoteEP;

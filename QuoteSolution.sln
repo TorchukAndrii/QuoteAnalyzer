@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuoteBroadcaster", "QuoteBr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuoteBroadcaster.Tests", "QuoteBroadcaster.Tests\QuoteBroadcaster.Tests.csproj", "{A4C4D140-27D9-4A3A-94E4-6F560F02AE5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuoteAnalyzer.Tests", "QuoteAnalyzer.Tests\QuoteAnalyzer.Tests.csproj", "{44E3B815-D0A1-402F-A82C-8DBFC5CB3104}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{A4C4D140-27D9-4A3A-94E4-6F560F02AE5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4C4D140-27D9-4A3A-94E4-6F560F02AE5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4C4D140-27D9-4A3A-94E4-6F560F02AE5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44E3B815-D0A1-402F-A82C-8DBFC5CB3104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44E3B815-D0A1-402F-A82C-8DBFC5CB3104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44E3B815-D0A1-402F-A82C-8DBFC5CB3104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44E3B815-D0A1-402F-A82C-8DBFC5CB3104}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

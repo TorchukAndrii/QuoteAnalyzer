@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using QuoteBroadcaster.UdpClientWrapper;
 
 namespace QuoteBroadcaster;
 
@@ -18,11 +17,10 @@ internal class Program
         Console.WriteLine("QuoteBroadcaster started. Press Ctrl+C to stop streaming quotes.");
         
         var udpClient = new UdpClient();
-        IUdpClientWrapper udpWrapper = new UdpClientWrapper.UdpClientWrapper(udpClient);
         var remoteEP = new IPEndPoint(IPAddress.Parse(config.MulticastIP), config.Port);
 
         var generator = new QuoteGenerator();
-        var broadcaster = new QuoteBroadcaster(udpWrapper, remoteEP);
+        var broadcaster = new QuoteBroadcaster(udpClient, remoteEP);
 
         using var cts = new CancellationTokenSource();
         Console.CancelKeyPress += (_, e) =>
