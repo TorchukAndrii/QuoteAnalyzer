@@ -5,15 +5,15 @@ namespace QuoteAnalyzer.ModeCounter;
 internal class SpaceSavingModeCounter : IModeCounter
 {
     private readonly int _k;
-    private readonly Dictionary<double, Entry> _table;
+    private readonly Dictionary<decimal, Entry> _table;
 
     public SpaceSavingModeCounter(int k)
     {
         _k = k;
-        _table = new Dictionary<double, Entry>();
+        _table = new Dictionary<decimal, Entry>();
     }
 
-    public void Add(double value)
+    public void Add(decimal value)
     {
         if (_table.TryGetValue(value, out var entry))
         {
@@ -40,9 +40,9 @@ internal class SpaceSavingModeCounter : IModeCounter
         }
     }
 
-    public double Mode()
+    public decimal Mode()
     {
-        if (_table.Count == 0) return 0.0;
+        if (_table.Count == 0) return 0m;
         return _table.Values.OrderByDescending(e => e.Count).First().Item;
     }
 
@@ -50,6 +50,6 @@ internal class SpaceSavingModeCounter : IModeCounter
     {
         public int Count;
         public int Error;
-        public double Item;
+        public decimal Item;
     }
 }

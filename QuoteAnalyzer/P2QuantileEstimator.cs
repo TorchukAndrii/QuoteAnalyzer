@@ -2,23 +2,23 @@
 
 public sealed class P2QuantileEstimator
 {
-    private readonly double _p; // quantile (0..1)
-    private readonly double[] dn = new double[5];
-    private readonly double[] n = new double[5];
-    private readonly double[] np = new double[5];
-    private readonly double[] q = new double[5];
+    private readonly decimal _p; // quantile (0..1)
+    private readonly decimal[] dn = new decimal[5];
+    private readonly decimal[] n = new decimal[5];
+    private readonly decimal[] np = new decimal[5];
+    private readonly decimal[] q = new decimal[5];
     private long _count;
     private bool _initialized;
 
-    public P2QuantileEstimator(double p)
+    public P2QuantileEstimator(decimal p)
     {
         if (p <= 0 || p >= 1) throw new ArgumentOutOfRangeException(nameof(p));
         _p = p;
     }
 
-    public double Estimate => !_initialized ? double.NaN : q[2];
+    public decimal Estimate => !_initialized ? 0m : q[2];
 
-    public void Add(double x)
+    public void Add(decimal x)
     {
         if (_count < 5)
         {
@@ -94,14 +94,14 @@ public sealed class P2QuantileEstimator
         }
     }
 
-    private double Parabolic(int i, int d)
+    private decimal Parabolic(int i, int d)
     {
         var a = d * (n[i] - n[i - 1] + d) * (q[i + 1] - q[i]) / (n[i + 1] - n[i])
                 + d * (n[i + 1] - n[i] - d) * (q[i] - q[i - 1]) / (n[i] - n[i - 1]);
         return q[i] + a / (n[i + 1] - n[i - 1]);
     }
 
-    private double Linear(int i, int d)
+    private decimal Linear(int i, int d)
     {
         return q[i] + d * (q[i + d] - q[i]) / (n[i + d] - n[i]);
     }

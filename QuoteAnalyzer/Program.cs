@@ -16,7 +16,7 @@ internal class Program
         if (config.Mode == ModeAlgorithm.SpaceSaving)
             Console.WriteLine("Warning: Space-Saving is approximate and may slightly affect mode accuracy.");
 
-        var channel = Channel.CreateUnbounded<double>();
+        var channel = Channel.CreateUnbounded<decimal>();
         var modeCounter = ModeCounterFactory.Create(config.Mode); // pass enum
         var stats = new StatisticsCalculator(modeCounter);
         var receiver = new QuoteReceiver(config.MulticastIP, config.Port, channel.Writer);

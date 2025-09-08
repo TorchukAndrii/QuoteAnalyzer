@@ -7,7 +7,7 @@ public sealed class StatisticsCalculator
     private readonly object _statsLock = new();
     
     private readonly IModeCounter _modeCounter;
-    private readonly P2QuantileEstimator _p2Median = new(0.5);
+    private readonly P2QuantileEstimator _p2Median = new(0.5m);
     private readonly Welford _stats = new();
 
     public StatisticsCalculator(IModeCounter modeCounter)
@@ -15,7 +15,7 @@ public sealed class StatisticsCalculator
         _modeCounter = modeCounter;
     }
 
-    public void Add(double value)
+    public void Add(decimal value)
     {
         lock (_statsLock)
         {
