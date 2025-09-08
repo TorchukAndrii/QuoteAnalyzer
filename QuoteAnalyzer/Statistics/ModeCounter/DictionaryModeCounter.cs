@@ -1,6 +1,4 @@
-﻿using QuoteAnalyzer.Statistics.ModeCounter;
-
-namespace QuoteAnalyzer.ModeCounter;
+﻿namespace QuoteAnalyzer.Statistics.ModeCounter;
 
 internal class DictionaryModeCounter : IModeCounter
 {

@@ -9,10 +9,6 @@ public sealed class QuoteReceiver : IAsyncDisposable
 {
     private readonly UdpClient _udpClient;
     private readonly ChannelWriter<decimal> _writer;
-    
-    private long _networkErrors;
-    private long _parseErrors;
-    private long _receivedCount;
 
     public QuoteReceiver(string multicastIP, int port, ChannelWriter<decimal> writer)
     {
@@ -23,9 +19,16 @@ public sealed class QuoteReceiver : IAsyncDisposable
         _udpClient.JoinMulticastGroup(IPAddress.Parse(multicastIP));
     }
 
-    public long ReceivedCount => _receivedCount;
-    public long ParseErrors => _parseErrors;
-    public long NetworkErrors => _networkErrors;
+    private long _receivedCount;
+    private long _parseErrors;
+    private long _networkErrors;
+    private long _lostCount;
+
+    public long ReceivedCount => Interlocked.Read(ref _receivedCount);
+    public long ParseErrors => Interlocked.Read(ref _parseErrors);
+    public long NetworkErrors => Interlocked.Read(ref _networkErrors);
+    public long LostCount => Interlocked.Read(ref _lostCount);
+
 
 
     public ValueTask DisposeAsync()
@@ -36,19 +39,36 @@ public sealed class QuoteReceiver : IAsyncDisposable
 
     public async Task RunAsync(CancellationToken token)
     {
+        long lastSeq = 0;
+
         try
         {
             while (!token.IsCancellationRequested)
+            {
                 try
                 {
                     var result = await _udpClient.ReceiveAsync(token);
                     Interlocked.Increment(ref _receivedCount);
 
                     var text = Encoding.UTF8.GetString(result.Buffer).Trim();
-                    if (decimal.TryParse(text, out var value))
+                    var parts = text.Split(':');
+
+                    if (parts.Length == 2 &&
+                        long.TryParse(parts[0], out long seq) &&
+                        decimal.TryParse(parts[1], out var value))
+                    {
+                        if (lastSeq > 0 && seq != lastSeq + 1)
+                        {
+                            Interlocked.Add(ref _lostCount, seq - (lastSeq + 1));
+                        }
+
+                        lastSeq = seq;
                         _writer.TryWrite(value);
+                    }
                     else
+                    {
                         Interlocked.Increment(ref _parseErrors);
+                    }
                 }
                 catch (OperationCanceledException) when (token.IsCancellationRequested)
                 {
@@ -66,10 +86,19 @@ public sealed class QuoteReceiver : IAsyncDisposable
                 {
                     Interlocked.Increment(ref _networkErrors);
                 }
+            }
         }
         finally
         {
             _writer.TryComplete();
         }
+    }
+    public string GetErrorsReport()
+    {
+        return
+            $"Received: {ReceivedCount}, " +
+            $"ParseErrors: {ParseErrors}, " +
+            $"NetworkErrors: {NetworkErrors}, " +
+            $"Lost: {LostCount}";
     }
 }

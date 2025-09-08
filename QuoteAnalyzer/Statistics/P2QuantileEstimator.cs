@@ -1,8 +1,8 @@
-﻿namespace QuoteAnalyzer;
+﻿namespace QuoteAnalyzer.Statistics;
 
 public sealed class P2QuantileEstimator
 {
-    private readonly decimal _p; // quantile (0..1)
+    private readonly decimal _p;
     private readonly decimal[] dn = new decimal[5];
     private readonly decimal[] n = new decimal[5];
     private readonly decimal[] np = new decimal[5];

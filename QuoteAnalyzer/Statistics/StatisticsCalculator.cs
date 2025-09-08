@@ -25,16 +25,16 @@ public sealed class StatisticsCalculator
         }
     }
 
-    public string GetReport(long received, long parseErrors, long networkErrors)
+    public string GetStatisticsReport()
     {
         lock (_statsLock)
         {
-            return $"Received: {received}, ParseErrors: {parseErrors}, NetworkErrors: {networkErrors}\n" +
-                   $"Total processed: {_stats.Count}, " +
-                   $"Arithmetic mean: {_stats.Mean}, " +
-                   $"Standard deviation: {_stats.StdDev}, " +
-                   $"Mode: {_modeCounter.Mode()}, " +
-                   $"Median: {_p2Median.Estimate}";
+            return
+                $"Total processed: {_stats.Count}, " +
+                $"Arithmetic mean: {_stats.Mean}, " +
+                $"Standard deviation: {_stats.StdDev}, " +
+                $"Mode: {_modeCounter.Mode()}, " +
+                $"Median: {_p2Median.Estimate}";
         }
     }
 }

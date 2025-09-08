@@ -16,9 +16,11 @@ internal class Program
         if (config.Mode == ModeAlgorithm.SpaceSaving)
             Console.WriteLine("Warning: Space-Saving is approximate and may slightly affect mode accuracy.");
 
+        Console.WriteLine("Press Enter at any time to display current statistics...");
+
         var channel = Channel.CreateUnbounded<decimal>();
         var modeCounter = ModeCounterFactory.Create(config.Mode); // pass enum
-        var stats = new StatisticsCalculator(modeCounter);
+        var statsCalculator = new StatisticsCalculator(modeCounter);
         var receiver = new QuoteReceiver(config.MulticastIP, config.Port, channel.Writer);
 
         using var cts = new CancellationTokenSource();
@@ -34,7 +36,7 @@ internal class Program
         {
             try
             {
-                await foreach (var value in channel.Reader.ReadAllAsync()) stats.Add(value);
+                await foreach (var value in channel.Reader.ReadAllAsync()) statsCalculator.Add(value);
             }
             catch (OperationCanceledException)
             {
@@ -52,9 +54,10 @@ internal class Program
                 break;
             }
 
-            Console.WriteLine("=== Current Statistics ===");
-            Console.WriteLine(stats.GetReport(receiver.ReceivedCount, receiver.ParseErrors, receiver.NetworkErrors));
-            Console.WriteLine("==========================");
+            Console.WriteLine("=== Current Report ===");
+            Console.WriteLine(receiver.GetErrorsReport());
+            Console.WriteLine(statsCalculator.GetStatisticsReport());
+            Console.WriteLine("=====================");
         }
 
         await Task.WhenAll(receiverTask, consumerTask);

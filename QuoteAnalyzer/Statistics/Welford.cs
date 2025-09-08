@@ -1,4 +1,4 @@
-﻿namespace QuoteAnalyzer;
+﻿namespace QuoteAnalyzer.Statistics;
 
 internal class Welford
 {

@@ -32,10 +32,16 @@ internal class Program
 
         try
         {
+            
+            long seq = 0;
+
             while (!cts.Token.IsCancellationRequested)
             {
+                seq++;
                 decimal quote = GenerateRandomQuote(config.MinValue, config.MaxValue, config.TickSize);
-                string msg = quote.ToString("F2");
+
+                // Include sequence number in message: "seq:quote"
+                string msg = $"{seq}:{quote:F2}";
                 byte[] buffer = _encoding.GetBytes(msg);
 
                 await udpClient.SendAsync(buffer, buffer.Length, remoteEP);

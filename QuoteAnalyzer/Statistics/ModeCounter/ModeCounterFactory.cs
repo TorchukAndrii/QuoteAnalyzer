@@ -1,6 +1,4 @@
-﻿using QuoteAnalyzer.ModeCounter;
-
-namespace QuoteAnalyzer.Statistics.ModeCounter;
+﻿namespace QuoteAnalyzer.Statistics.ModeCounter;
 
 public static class ModeCounterFactory
 {
