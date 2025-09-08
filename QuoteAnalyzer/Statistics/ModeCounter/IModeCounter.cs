@@ -1,4 +1,4 @@
-﻿namespace QuoteAnalyzer.ModeCounter;
+﻿namespace QuoteAnalyzer.Statistics.ModeCounter;
 
 public interface IModeCounter
 {

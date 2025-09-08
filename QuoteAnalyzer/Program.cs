@@ -1,5 +1,6 @@
 ﻿using System.Threading.Channels;
-using QuoteAnalyzer.ModeCounter;
+using QuoteAnalyzer.Statistics;
+using QuoteAnalyzer.Statistics.ModeCounter;
 
 namespace QuoteAnalyzer;
 
@@ -10,12 +11,13 @@ internal class Program
         var config = new AppConfig("config.xml");
 
         Console.WriteLine($"Listening on {config.MulticastIP}:{config.Port} ...");
-        Console.WriteLine($"Mode algorithm: {config.ModeAlgorithm}");
-        if (config.ModeAlgorithm.Equals("SpaceSaving", StringComparison.OrdinalIgnoreCase))
+        Console.WriteLine($"Mode algorithm: {config.Mode}");
+
+        if (config.Mode == ModeAlgorithm.SpaceSaving)
             Console.WriteLine("Warning: Space-Saving is approximate and may slightly affect mode accuracy.");
 
         var channel = Channel.CreateUnbounded<double>();
-        var modeCounter = ModeCounterFactory.Create(config.ModeAlgorithm);
+        var modeCounter = ModeCounterFactory.Create(config.Mode); // pass enum
         var stats = new StatisticsCalculator(modeCounter);
         var receiver = new QuoteReceiver(config.MulticastIP, config.Port, channel.Writer);
 

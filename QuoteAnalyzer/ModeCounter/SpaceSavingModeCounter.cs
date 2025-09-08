@@ -1,4 +1,6 @@
-﻿namespace QuoteAnalyzer.ModeCounter;
+﻿using QuoteAnalyzer.Statistics.ModeCounter;
+
+namespace QuoteAnalyzer.ModeCounter;
 
 internal class SpaceSavingModeCounter : IModeCounter
 {
