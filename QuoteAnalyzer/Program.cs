@@ -8,7 +8,8 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        var config = new AppConfig("config.xml");
+        var configPath = Path.Combine(AppContext.BaseDirectory, "config.xml");
+        var config = new AppConfig(configPath);
 
         Console.WriteLine($"Listening on {config.MulticastIP}:{config.Port} ...");
         Console.WriteLine($"Mode algorithm: {config.Mode}");

@@ -7,15 +7,16 @@ internal class Program
 {
     public static async Task Main(string[] args)
     {
+        var configPath = Path.Combine(AppContext.BaseDirectory, "config.xml");
         var configLoader = new ConfigLoader();
-        var config = configLoader.LoadFromFile("config.xml");
-        
+        var config = configLoader.LoadFromFile(configPath);
+
         Console.WriteLine(
             $"Config: IP={config.MulticastIP}, Port={config.Port}, Range=[{config.MinValue};{config.MaxValue}], TickSize={config.TickSize}"
         );
-        
+
         Console.WriteLine("QuoteBroadcaster started. Press Ctrl+C to stop streaming quotes.");
-        
+
         var udpClient = new UdpClient();
         var remoteEP = new IPEndPoint(IPAddress.Parse(config.MulticastIP), config.Port);
 
@@ -31,11 +32,8 @@ internal class Program
 
         while (!cts.Token.IsCancellationRequested)
         {
-            decimal quote = generator.Generate(config.MinValue, config.MaxValue, config.TickSize);
+            var quote = generator.Generate(config.MinValue, config.MaxValue, config.TickSize);
             await broadcaster.BroadcastQuoteAsync(quote);
         }
     }
-
-    
-    
 }
