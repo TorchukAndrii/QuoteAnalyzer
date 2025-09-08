@@ -79,7 +79,7 @@ Run all tests:
 dotnet test
 ```
 
-* **QuoteAnalyzer.Tests** → Welford, P² quantile estimator, mode counters, StatisticsCalculator
+* **QuoteAnalyzer.Tests** → Welford, P² quantile estimator, mode counters
 * **QuoteBroadcaster.Tests** → QuoteBroadcaster components
 
 ---
