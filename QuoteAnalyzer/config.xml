@@ -1,6 +1,0 @@
-﻿<Settings>
-    <MulticastIP>239.0.0.222</MulticastIP>
-    <Port>5000</Port>
-    <ModeAlgorithm>Dictionary</ModeAlgorithm> <!-- Select the mode calculation algorithm: "Dictionary" – exact counting (may use significant memory for large value ranges), 
-     "SpaceSaving" – approximate counting for large streams with limited memory (may slightly affect accuracy) -->
-</Settings>

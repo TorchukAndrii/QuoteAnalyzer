@@ -5,13 +5,14 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>ConsoleApp3</RootNamespace>
+        <RootNamespace>QuoteAnalyzer</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="config.xml">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+      <Content Include="..\config.xml">
+        <Link>config.xml</Link>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

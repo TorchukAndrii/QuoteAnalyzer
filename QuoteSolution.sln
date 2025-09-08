@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuoteAnalyzer", "QuoteAnalyzer\QuoteAnalyzer.csproj", "{344A930A-E476-4BCA-BC77-BE9BB0953088}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuoteBroadcaster", "QuoteBroadcaster\QuoteBroadcaster.csproj", "{0B1F9A24-6B35-4FF6-AFA6-2AC3925CB169}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{344A930A-E476-4BCA-BC77-BE9BB0953088}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{344A930A-E476-4BCA-BC77-BE9BB0953088}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{344A930A-E476-4BCA-BC77-BE9BB0953088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B1F9A24-6B35-4FF6-AFA6-2AC3925CB169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B1F9A24-6B35-4FF6-AFA6-2AC3925CB169}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B1F9A24-6B35-4FF6-AFA6-2AC3925CB169}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B1F9A24-6B35-4FF6-AFA6-2AC3925CB169}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
