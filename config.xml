@@ -9,9 +9,4 @@
 
     <!-- Tick size for quotes (step between possible values) -->
     <TickSize>0.10</TickSize>
-
-    <ModeAlgorithm>Dictionary</ModeAlgorithm>
-    <!-- Select the mode calculation algorithm: "Dictionary" – exact counting (may use significant memory for large value ranges), 
-         "SpaceSaving" – approximate counting for large streams with limited memory (may slightly affect accuracy) -->
-    <ModeAlgorithm>Dictionary</ModeAlgorithm>
 </Settings>

@@ -1,5 +1,4 @@
 ﻿using System.Xml.Linq;
-using QuoteAnalyzer.Statistics.ModeCounter;
 
 namespace QuoteAnalyzer.Tests;
 
@@ -10,8 +9,7 @@ public class AppConfigTests
     {
         var xml = new XElement("Config",
             new XElement("MulticastIP", "239.1.1.1"),
-            new XElement("Port", "6000"),
-            new XElement("ModeAlgorithm", "SpaceSaving")
+            new XElement("Port", "6000")
         );
 
         string path = "test.xml";
@@ -21,7 +19,6 @@ public class AppConfigTests
 
         Assert.Equal("239.1.1.1", config.MulticastIP);
         Assert.Equal(6000, config.Port);
-        Assert.Equal(ModeAlgorithm.SpaceSaving, config.Mode);
     }
 
     [Fact]
@@ -35,21 +32,5 @@ public class AppConfigTests
 
         Assert.Equal("239.0.0.222", config.MulticastIP);
         Assert.Equal(5000, config.Port);
-        Assert.Equal(ModeAlgorithm.Dictionary, config.Mode);
-    }
-
-    [Theory]
-    [InlineData("dictionary", ModeAlgorithm.Dictionary)]
-    [InlineData("spacesaving", ModeAlgorithm.SpaceSaving)]
-    [InlineData("", ModeAlgorithm.Dictionary)]
-    [InlineData(null, ModeAlgorithm.Dictionary)]
-    [InlineData("unknown", ModeAlgorithm.Dictionary)]
-    public void ParseModeAlgorithm_ShouldReturnExpectedMode(string input, ModeAlgorithm expected)
-    {
-        var result = typeof(AppConfig)
-            .GetMethod("ParseModeAlgorithm", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!
-            .Invoke(null, new object?[] { input });
-
-        Assert.Equal(expected, result);
     }
 }

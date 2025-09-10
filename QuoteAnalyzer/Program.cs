@@ -1,6 +1,5 @@
 ﻿using System.Threading.Channels;
 using QuoteAnalyzer.Statistics;
-using QuoteAnalyzer.Statistics.ModeCounter;
 
 namespace QuoteAnalyzer;
 
@@ -12,17 +11,12 @@ internal class Program
         var config = new AppConfig(configPath);
 
         Console.WriteLine($"Listening on {config.MulticastIP}:{config.Port} ...");
-        Console.WriteLine($"Mode algorithm: {config.Mode}");
-
-        if (config.Mode == ModeAlgorithm.SpaceSaving)
-            Console.WriteLine("Warning: Space-Saving is approximate and may slightly affect mode accuracy.");
 
         Console.WriteLine("Press Enter at any time to display current statistics...");
         Console.WriteLine("Press 'q' to quit.");
 
         var channel = Channel.CreateUnbounded<decimal>();
-        var modeCounter = ModeCounterFactory.Create(config.Mode);
-        var statsCalculator = new StatisticsCalculator(modeCounter);
+        var statisticsAggregator = new StatisticsAggregator();
         var receiver = new QuoteReceiver(config.MulticastIP, config.Port, channel.Writer);
 
         using var cts = new CancellationTokenSource();
@@ -55,7 +49,7 @@ internal class Program
             try
             {
                 await foreach (var value in channel.Reader.ReadAllAsync(cts.Token))
-                    statsCalculator.Add(value);
+                    statisticsAggregator.Add(value);
             }
             catch (OperationCanceledException)
             {
@@ -81,7 +75,7 @@ internal class Program
 
             Console.WriteLine("=== Current Report ===");
             Console.WriteLine(receiver.GetErrorsReport());
-            Console.WriteLine(statsCalculator.GetStatisticsReport());
+            Console.WriteLine(statisticsAggregator.GetStatisticsReport());
             Console.WriteLine("=====================");
         }
 
