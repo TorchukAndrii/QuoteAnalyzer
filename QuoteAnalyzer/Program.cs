@@ -6,7 +6,7 @@ namespace QuoteAnalyzer;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
         var configPath = Path.Combine(AppContext.BaseDirectory, "config.xml");
         var config = new AppConfig(configPath);
@@ -18,9 +18,10 @@ internal class Program
             Console.WriteLine("Warning: Space-Saving is approximate and may slightly affect mode accuracy.");
 
         Console.WriteLine("Press Enter at any time to display current statistics...");
+        Console.WriteLine("Press 'q' to quit.");
 
         var channel = Channel.CreateUnbounded<decimal>();
-        var modeCounter = ModeCounterFactory.Create(config.Mode); // pass enum
+        var modeCounter = ModeCounterFactory.Create(config.Mode);
         var statsCalculator = new StatisticsCalculator(modeCounter);
         var receiver = new QuoteReceiver(config.MulticastIP, config.Port, channel.Writer);
 
@@ -32,18 +33,41 @@ internal class Program
             cts.Cancel();
         };
 
-        var receiverTask = receiver.RunAsync(cts.Token);
-        var consumerTask = Task.Run(async () =>
+        // Receiver thread
+        var receiverThread = new Thread(async () =>
         {
             try
             {
-                await foreach (var value in channel.Reader.ReadAllAsync()) statsCalculator.Add(value);
+                await receiver.RunAsync(cts.Token);
             }
             catch (OperationCanceledException)
             {
                 // safe exit
             }
-        });
+        })
+        {
+            IsBackground = true
+        };
+
+        // Consumer thread
+        var consumerThread = new Thread(async () =>
+        {
+            try
+            {
+                await foreach (var value in channel.Reader.ReadAllAsync(cts.Token))
+                    statsCalculator.Add(value);
+            }
+            catch (OperationCanceledException)
+            {
+                // safe exit
+            }
+        })
+        {
+            IsBackground = true
+        };
+
+        receiverThread.Start();
+        consumerThread.Start();
 
         // UI loop
         while (!cts.IsCancellationRequested)
@@ -61,6 +85,8 @@ internal class Program
             Console.WriteLine("=====================");
         }
 
-        await Task.WhenAll(receiverTask, consumerTask);
+        // Wait for threads to finish
+        receiverThread.Join();
+        consumerThread.Join();
     }
 }
