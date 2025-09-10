@@ -8,7 +8,6 @@
 
 * UDP Quote Broadcaster and Receiver
 * Online statistics: mean, standard deviation, mode, median
-* Supports Dictionary (exact) and Space-Saving (approximate) mode algorithms
 * Handles very large volumes of data (trillions of quotes) efficiently
 * Tracks lost quotes and network errors
 * Thread-safe, multi-threaded architecture for receiving and processing data
@@ -32,18 +31,11 @@ Both Broadcaster and Analyzer use a shared `config.xml` file with the following 
 
     <!-- Tick size for quotes (step between possible values) -->
     <TickSize>0.10</TickSize>
-
-    <!-- Mode calculation algorithm -->
-    <ModeAlgorithm>Dictionary</ModeAlgorithm>
-    <!-- Options:
-         "Dictionary" – exact counting (may use significant memory for large value ranges),
-         "SpaceSaving" – approximate counting for large streams with limited memory (may slightly affect accuracy) -->
 </Settings>
 ```
 
 * `MulticastIP` and `Port` specify where the server broadcasts quotes and where the client listens.
 * `MinValue`, `MaxValue`, `TickSize` define the range and steps of simulated quotes.
-* `ModeAlgorithm` selects the algorithm for mode calculation.
 
 ---
 
