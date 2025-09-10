@@ -9,7 +9,6 @@ public class MeanStdCalculatorTests
     {
         var w = new MeanStdCalculator();
 
-        Assert.Equal(0, w.Count);
         Assert.Equal(0m, w.Mean);
         Assert.Equal(0m, w.StandardDeviation);
     }
@@ -20,7 +19,6 @@ public class MeanStdCalculatorTests
         var w = new MeanStdCalculator();
         w.Add(10m);
 
-        Assert.Equal(1, w.Count);
         Assert.Equal(10m, w.Mean);
         Assert.Equal(0m, w.StandardDeviation); // std dev is zero with single value
     }
@@ -34,7 +32,6 @@ public class MeanStdCalculatorTests
         foreach (var v in values)
             w.Add(v);
 
-        Assert.Equal(values.Length, w.Count);
         Assert.Equal(3m, w.Mean); // mean = (1+2+3+4+5)/5 = 3
     }
 
@@ -61,7 +58,6 @@ public class MeanStdCalculatorTests
         foreach (var v in values)
             w.Add(v);
 
-        Assert.Equal(3, w.Count);
         Assert.Equal(0m, w.Mean);
         double expectedStandardDeviation = Math.Sqrt(((-10-0)*(-10-0) + (0-0)*(0-0) + (10-0)*(10-0))/3.0);
         Assert.Equal((decimal)expectedStandardDeviation, w.StandardDeviation, 6);

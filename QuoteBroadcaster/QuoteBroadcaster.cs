@@ -15,12 +15,21 @@ internal class QuoteBroadcaster
         _udpClient = udpClient;
         _remoteEP = remoteEP;
     }
-
+    
     public async Task BroadcastQuoteAsync(decimal quote)
     {
         _seq++;
-        string msg = $"{_seq}:{quote:F2}";
-        byte[] buffer = Encoding.UTF8.GetBytes(msg);
+        
+        byte[] buffer = new byte[sizeof(long) + sizeof(decimal)];
+        
+        BitConverter.TryWriteBytes(buffer.AsSpan(0, sizeof(long)), _seq);
+        
+        int[] bits = decimal.GetBits(quote); 
+        for (int i = 0; i < 4; i++)
+        {
+            BitConverter.TryWriteBytes(buffer.AsSpan(sizeof(long) + i * 4, 4), bits[i]);
+        }
+
         await _udpClient.SendAsync(buffer, buffer.Length, _remoteEP);
     }
 }

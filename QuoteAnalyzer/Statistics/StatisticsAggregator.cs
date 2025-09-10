@@ -33,7 +33,6 @@ public sealed class StatisticsAggregator
         lock (_statsLock)
         {
             return
-                $"Total processed: {_meanStdCalculator.Count}, " +
                 $"Arithmetic mean: {_meanStdCalculator.Mean}, " +
                 $"Standard deviation: {_meanStdCalculator.StandardDeviation}, " +
                 $"Mode: {_modeCalculator.Mode}, " +

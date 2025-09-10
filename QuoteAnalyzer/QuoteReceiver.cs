@@ -40,6 +40,8 @@ public sealed class QuoteReceiver : IAsyncDisposable
     public async Task RunAsync(CancellationToken token)
     {
         long lastSeq = 0;
+        
+        int expectedSize = sizeof(long) + sizeof(decimal);
 
         try
         {
@@ -50,25 +52,27 @@ public sealed class QuoteReceiver : IAsyncDisposable
                     var result = await _udpClient.ReceiveAsync(token);
                     Interlocked.Increment(ref _receivedCount);
 
-                    var text = Encoding.UTF8.GetString(result.Buffer).Trim();
-                    var parts = text.Split(':');
-
-                    if (parts.Length == 2 &&
-                        long.TryParse(parts[0], out long seq) &&
-                        decimal.TryParse(parts[1], out var value))
-                    {
-                        if (lastSeq > 0 && seq != lastSeq + 1)
-                        {
-                            Interlocked.Add(ref _lostCount, seq - (lastSeq + 1));
-                        }
-
-                        lastSeq = seq;
-                        _writer.TryWrite(value);
-                    }
-                    else
+                    if (result.Buffer.Length < expectedSize)
                     {
                         Interlocked.Increment(ref _parseErrors);
+                        continue; // skip this packet
                     }
+
+                    // extract sequence number and value from buffer
+                    long seq = BitConverter.ToInt64(result.Buffer, 0);
+                    int[] bits = new int[4];
+                    for (int i = 0; i < 4; i++)
+                        bits[i] = BitConverter.ToInt32(result.Buffer, 8 + i * 4);
+
+                    decimal value = new decimal(bits);
+
+                    if (lastSeq > 0 && seq != lastSeq + 1)
+                    {
+                        Interlocked.Add(ref _lostCount, seq - (lastSeq + 1));
+                    }
+
+                    lastSeq = seq;
+                    _writer.TryWrite(value);
                 }
                 catch (OperationCanceledException) when (token.IsCancellationRequested)
                 {
@@ -93,6 +97,7 @@ public sealed class QuoteReceiver : IAsyncDisposable
             _writer.TryComplete();
         }
     }
+
     public string GetErrorsReport()
     {
         return

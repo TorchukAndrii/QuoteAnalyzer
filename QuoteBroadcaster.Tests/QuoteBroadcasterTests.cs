@@ -7,18 +7,37 @@ public class QuoteBroadcasterTests
 {
     private int GetRandomPort() => new Random().Next(20000, 40000);
 
+    private decimal ReadDecimalFromBuffer(byte[] buffer, int offset = 8)
+    {
+        int[] bits = new int[4];
+        for (int i = 0; i < 4; i++)
+            bits[i] = BitConverter.ToInt32(buffer, 8 + i * 4);
+
+        return  new decimal(bits);
+    }
+
+    private long ReadSeqFromBuffer(byte[] buffer)
+    {
+        return BitConverter.ToInt64(buffer, 0);
+    }
+
     [Fact]
     public async Task ShouldBroadcastSingleQuote()
     {
         int port = GetRandomPort();
-        using var listener = new UdpClient(port); // bind listener first
+        using var listener = new UdpClient(port);
         var endpoint = new IPEndPoint(IPAddress.Loopback, port);
         var broadcaster = new QuoteBroadcaster(new UdpClient(), endpoint);
 
-        await broadcaster.BroadcastQuoteAsync(1.00m);
+        decimal quote = 1.00m;
+        await broadcaster.BroadcastQuoteAsync(quote);
 
-        string message = await UdpTestHelper.ReceiveUdpMessage(listener);
-        Assert.Equal("1:1.00", message);
+        var result = await UdpTestHelper.ReceiveUdpBytes(listener);
+        long seq = ReadSeqFromBuffer(result);
+        decimal value = ReadDecimalFromBuffer(result);
+
+        Assert.Equal(1, seq);
+        Assert.Equal(quote, value);
     }
 
     [Fact]
@@ -29,27 +48,36 @@ public class QuoteBroadcasterTests
         var endpoint = new IPEndPoint(IPAddress.Loopback, port);
         var broadcaster = new QuoteBroadcaster(new UdpClient(), endpoint);
 
-        await broadcaster.BroadcastQuoteAsync(1.00m);
-        await broadcaster.BroadcastQuoteAsync(2.50m);
+        decimal q1 = 1.00m;
+        decimal q2 = 2.50m;
 
-        string msg1 = await UdpTestHelper.ReceiveUdpMessage(listener);
-        string msg2 = await UdpTestHelper.ReceiveUdpMessage(listener);
+        await broadcaster.BroadcastQuoteAsync(q1);
+        await broadcaster.BroadcastQuoteAsync(q2);
 
-        Assert.Equal("1:1.00", msg1);
-        Assert.Equal("2:2.50", msg2);
+        var r1 = await UdpTestHelper.ReceiveUdpBytes(listener);
+        var r2 = await UdpTestHelper.ReceiveUdpBytes(listener);
+
+        Assert.Equal(1, ReadSeqFromBuffer(r1));
+        Assert.Equal(q1, ReadDecimalFromBuffer(r1));
+
+        Assert.Equal(2, ReadSeqFromBuffer(r2));
+        Assert.Equal(q2, ReadDecimalFromBuffer(r2));
     }
 
     [Fact]
-    public async Task ShouldFormatDecimalWithTwoDigits()
+    public async Task ShouldSendDecimalExactly()
     {
         int port = GetRandomPort();
         using var listener = new UdpClient(port);
         var endpoint = new IPEndPoint(IPAddress.Loopback, port);
         var broadcaster = new QuoteBroadcaster(new UdpClient(), endpoint);
 
-        await broadcaster.BroadcastQuoteAsync(123.4567m);
+        decimal quote = 123.4567m;
+        await broadcaster.BroadcastQuoteAsync(quote);
 
-        string msg = await UdpTestHelper.ReceiveUdpMessage(listener);
-        Assert.Equal("1:123.46", msg);
+        var result = await UdpTestHelper.ReceiveUdpBytes(listener);
+        decimal received = ReadDecimalFromBuffer(result);
+
+        Assert.Equal(quote, received);
     }
 }

@@ -1,18 +1,18 @@
 ﻿using System.Net.Sockets;
-using System.Text;
-
-namespace QuoteBroadcaster.Tests;
 
 public static class UdpTestHelper
 {
-    public static async Task<string> ReceiveUdpMessage(UdpClient listener, int timeoutMs = 500)
+    public static async Task<byte[]> ReceiveUdpBytes(UdpClient listener, int timeoutMs = 500)
     {
-        var task = listener.ReceiveAsync();
-        if (await Task.WhenAny(task, Task.Delay(timeoutMs)) == task)
+        var receiveTask = listener.ReceiveAsync();
+        var delayTask = Task.Delay(timeoutMs);
+
+        var completed = await Task.WhenAny(receiveTask, delayTask);
+        if (completed == receiveTask)
         {
-            var result = task.Result;
-            return Encoding.UTF8.GetString(result.Buffer);
+            return receiveTask.Result.Buffer;
         }
-        throw new TimeoutException("No message received in time.");
+
+        throw new TimeoutException("No UDP message received within the timeout.");
     }
 }
